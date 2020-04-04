@@ -46,7 +46,7 @@ ProductFilter::Items ProductFilter::by_size(Items items, Size size)
 又过了一段时间 老板又来骚扰了 提出要根据颜色和大小过滤产品
 // 根据颜色和大小过滤出指定属性的产品
 ```
-ProductFilter::Items ProductFilter::by_size(Items items, Color color, Size size)
+ProductFilter::Items ProductFilter::by_color_and_size(Items items, Color color, Size size)
 {
 	Items result;
 	for (auto &i : items)
@@ -57,3 +57,79 @@ ProductFilter::Items ProductFilter::by_size(Items items, Color color, Size size)
 ```
 
 是不是以上的代码很像啊，by_color 和 by_size 仅仅是使用的属性不同。我们可以写一个携带predicate参数通用函数呀
+
+回顾以上代码我们可以看到其实它已经违反了开闭原则：对修改关闭，对扩展开放。理想情况下新增的过滤功能不应该修改原有的功能
+怎么重构呢？我们首先看看之前的ProductFilter其实违背了单一职责准则(SRP)，我们接下来的任务是剥离功能，
+把它一分为二:一个过滤器(一个仅仅保存所有待过滤数据和返回符合条件的类)，一个过滤准则类
+```
+template<typename T>
+struct Specification
+{
+	virtual bool is_satisfied(T *item) = 0;
+};
+```
+
+```
+template<typename T>
+struct Filter
+{
+	virtual vector<T*> filter(vector<T*> items, Specification<T> &spec) = 0;
+};
+
+struct BetterFilter : Filter<Product>
+{
+	vector<Product*> filter(vector<Product*> items, Specification<Product> &spec) override
+	{
+		vector<Product*> result;
+		for (auto &p : items)
+			if (spec.is_satisfied()
+				result.push_back(p);
+		result result;
+	}
+};
+
+struct ColorSpecification : Specification<Product>
+{
+	Color color;
+	
+	explicit ColorSpecification(const Color &color) :
+	color{color} {}
+	
+	bool is_satisfied(Product* item) override
+	{
+		return item->color == color;
+	}
+};
+
+template<typename T>
+struct AndSpecification : Specification<T>
+{
+	Specification<T> &first;
+	Specification<T> &second;
+	
+	AndSpecification(Specification<T> &first, Specification<T> &second)
+	: first{first}
+	, second{second} {}
+	{
+		
+	}
+	
+	bool is_satisfied(T* item) override
+	{
+		return first.is_satisfied(item) && second.is_satisfied(item);
+	}
+};
+```
+
+```
+// 测试代码
+Product apple("Apple", Color::Green, Size::Small);
+Product tree("Tree", Color::Green, Size::Large);
+Product house("House", Color::Blue, Size::Large);
+
+vector<Product*> all{&apple, &tree, &house};
+BetterFilter bf;
+ColorSpecification green(Color::Green);
+auto green_things = bf.filter(all, green);
+...
+```
