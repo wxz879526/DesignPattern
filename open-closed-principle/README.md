@@ -45,6 +45,7 @@ ProductFilter::Items ProductFilter::by_size(Items items, Size size)
 
 又过了一段时间 老板又来骚扰了 提出要根据颜色和大小过滤产品
 // 根据颜色和大小过滤出指定属性的产品
+```
 ProductFilter::Items ProductFilter::by_size(Items items, Color color, Size size)
 {
 	Items result;
@@ -55,4 +56,4 @@ ProductFilter::Items ProductFilter::by_size(Items items, Color color, Size size)
 }
 ```
 
-是不是感觉似曾相识啊，by_color 和 by_size 仅仅是使用的属性不同。我们可以写一个携带predicate参数通用函数呀
+是不是以上的代码很像啊，by_color 和 by_size 仅仅是使用的属性不同。我们可以写一个携带predicate参数通用函数呀
