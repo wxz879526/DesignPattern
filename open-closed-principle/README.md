@@ -60,7 +60,7 @@ ProductFilter::Items ProductFilter::by_color_and_size(Items items, Color color, 
 
 回顾以上代码我们可以看到其实它已经违反了开闭原则：对修改关闭，对扩展开放。理想情况下新增的过滤功能不应该修改原有的功能
 怎么重构呢？我们首先看看之前的ProductFilter其实违背了单一职责准则(SRP)，我们接下来的任务是剥离功能，
-把它一分为二:一个过滤器(一个仅仅保存所有待过滤数据和返回符合条件的类)，一个过滤准则类
+把它一分为二:一个过滤器(一个仅仅保存所有待过滤数据和返回符合条件的类)，一个过滤准则类，即把原先判断条件的任务交由过滤准则类处理
 ```
 template<typename T>
 struct Specification
