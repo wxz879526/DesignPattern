@@ -29,3 +29,30 @@ ProductFilter::Items ProductFilter::by_color(Items items, Color color)
 	return result;
 }
 ```
+
+嗯 非常棒 运行也如你所期待的。不幸运的是，几天后老板又过来让你提供个根据大小过滤产品的功能，显而易见的，你又会打开ProductFilter.cpp 添加以下代码：
+```
+// 根据大小过滤出指定属性的产品
+ProductFilter::Items ProductFilter::by_size(Items items, Size size)
+{
+	Items result;
+	for (auto &i : items)
+		if (i->size == size)
+			result.push_back(i);
+	return result;
+}
+```
+
+又过了一段时间 老板又来骚扰了 提出要根据颜色和大小过滤产品
+// 根据颜色和大小过滤出指定属性的产品
+ProductFilter::Items ProductFilter::by_size(Items items, Color color, Size size)
+{
+	Items result;
+	for (auto &i : items)
+		if (i->color == color && i->size == size)
+			result.push_back(i);
+	return result;
+}
+```
+
+是不是感觉似曾相识啊，by_color 和 by_size 仅仅是使用的属性不同。我们可以写一个携带predicate参数通用函数呀
